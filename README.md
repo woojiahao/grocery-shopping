@@ -6,7 +6,7 @@ Inside `shopping-list.md`, you will find your shopping list items. As you walk a
 
 ## Goal
 
-Edit `shopping-list.md` and remove at least one item from the shopping list and add at least one new item to the shopping list (must be different from the items on the grocery list).
+Edit `shopping-list.md` and remove at least one item from the shopping list and add at least one new item to the shopping list.
 
 ## Submission
 
@@ -39,5 +39,31 @@ Have you added at least one (new) item to the shopping list? This item must not 
 <summary>Hint 3</summary>
 
 Not seeing your changes? Are you sure you have run `git add shopping-list.md` and run `bash submit.sh`?
+
+</details>
+
+<details>
+
+<summary>Hint 4</summary>
+
+Try to change the file to:
+
+```md
+- Apples
+- Pears
+```
+
+</details>
+
+<details>
+
+<summary>Hint 4</summary>
+
+Try to change the file to:
+
+```md
+- Apples
+- Pears
+```
 
 </details>
