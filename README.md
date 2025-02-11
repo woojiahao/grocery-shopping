@@ -54,16 +54,3 @@ Try to change the file to:
 ```
 
 </details>
-
-<details>
-
-<summary>Hint 4</summary>
-
-Try to change the file to:
-
-```md
-- Apples
-- Pears
-```
-
-</details>
