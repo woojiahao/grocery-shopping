@@ -24,40 +24,29 @@ fi
 EXERCISE_NAME=${PWD##*/}
 
 # Check if PR exists already
-OPEN_PR=$(gh pr list --repo git-mastery/$EXERCISE_NAME --state "open" --author "@me")
+OPEN_PR=$(gh pr list --repo git-mastery/$EXERCISE_NAME --state "open" --author "@me" --head "submission")
 
 CURRENT_USERNAME=$(gh api user -q ".login")
 
-HEAD=$1
+if [ ! $(git rev-parse --verify submission 2>/dev/null) ]; then
+  git branch submission 2>/dev/null
+fi
+
+# We need to push the submission to the submission branch so we just want to switch back after
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+echo "Pushing all changes"
+git push --all origin
+git checkout submission
+git commit -m "Submission" --allow-empty
+git push origin submission
+git checkout $CURRENT_BRANCH
 
 if [[ -z $OPEN_PR ]]; then
   echo "You don't have an open PR for $EXERCISE_NAME yet, creating one on your behalf"
-  if [[ -z $HEAD ]]; then
-    CURRENT_BRANCH=$(git branch --show-current)
-    echo "Using current branch $CURRENT_BRANCH"
-    git push -u origin $CURRENT_BRANCH
-    gh pr create \
-      --repo git-mastery/$EXERCISE_NAME \
-      --title "[$CURRENT_USERNAME] [$EXERCISE_NAME] Submission" \
-      --body "" \
-      --head $CURRENT_USERNAME:$CURRENT_BRANCH
-  else
-    echo "Using $HEAD instead"
-    git push -u origin $HEAD
-    gh pr create \
-      --repo git-mastery/$EXERCISE_NAME \
-      --title "[$CURRENT_USERNAME] [$EXERCISE_NAME] Submission" \
-      --body "" \
-      --head $CURRENT_USERNAME:$HEAD
-  fi
-else
-  # If a PR already exists, we can just push directly
-  if [[ -z $HEAD ]]; then
-    CURRENT_BRANCH=$(git branch --show-current)
-    echo "Pushing $CURRENT_BRANCH"
-    git push -u origin $CURRENT_BRANCH
-  else
-    echo "Pushing $HEAD"
-    git push -u origin $HEAD
-  fi
+  gh pr create \
+    --repo git-mastery/$EXERCISE_NAME \
+    --title "[$CURRENT_USERNAME] [$EXERCISE_NAME] Submission" \
+    --body "" \
+    --head $CURRENT_USERNAME:submission
 fi
