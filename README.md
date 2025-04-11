@@ -2,9 +2,13 @@
 
 You have been tasked to go grocery shopping for the week.
 
-Inside `shopping-list.md`, you will find your shopping list items. As you walk around the grocery shop, you remove items from the shopping list that you found. You also notice that your shopping list is missing several things that you cannot find in the current grocery store, so you start adding to the shopping list.
+Inside `shopping-list.txt`, you will find your shopping list items. As you walk around the grocery shop, you remove items from the shopping list that you found. You also notice that your shopping list is missing several things that you cannot find in the current grocery store, so you start adding to the shopping list.
 
-## Goal
+## Learning outcomes
+
+- [ ] Apply `git add` and `git commit`
+
+## Task
 
 Edit `shopping-list.md` and remove at least one item from the shopping list and add at least one new item to the shopping list.
 
@@ -38,7 +42,7 @@ Have you added at least one (new) item to the shopping list? This item must not 
 
 <summary>Hint 3</summary>
 
-Not seeing your changes? Are you sure you have run `git add shopping-list.md` and run `bash submit.sh`?
+Not seeing your changes? Are you sure you have run `git add shopping-list.txt` and run `bash submit.sh`?
 
 </details>
 
