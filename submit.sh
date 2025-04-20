@@ -1,52 +1,73 @@
 #!/bin/bash
 
-# TODO maybe this should be a dedicated CLI instead of a complex Bash script
-
 set -e
 
+log_step() {
+  echo "[INFO] $1"
+}
+
+error_exit() {
+  echo "[ERROR] $1" >&2
+  exit 1
+}
+
 check_binary() {
-  if ! which "$1" >/dev/null; then
-    (>&2 echo "$2")
-    exit 1
+  if ! which "$1" >/dev/null 2>&1; then
+    error_exit "$2"
   fi
 }
 
-# TODO Maybe check if Github connection is working as well?
-check_binary "git" "You need to install Github"
-check_binary "gh" "You need to install the Github CLI"
+# Check for required tools
+check_binary "git" "You need to install Git"
+check_binary "gh" "You need to install the GitHub CLI"
 
+# Check GitHub authentication
 if ! gh auth status >/dev/null 2>&1; then
-  echo "You aren't logged in to Github CLI yet. Run gh auth login to login"
-  exit 1
+  error_exit "You aren't logged into GitHub CLI. Run 'gh auth login' to login."
 fi
 
-# Get current directory name to get exercise name
+# Get current directory name to determine exercise name
 EXERCISE_NAME=${PWD##*/}
+log_step "Detected exercise: $EXERCISE_NAME"
 
-# Check if PR exists already
-OPEN_PR=$(gh pr list --repo git-mastery/$EXERCISE_NAME --state "open" --author "@me" --head "submission")
+# Check if a PR already exists
+OPEN_PR=$(gh pr list --state "open" --author "@me" --head "submission" 2>/dev/null)
 
-CURRENT_USERNAME=$(gh api user -q ".login")
+# Get current GitHub username
+CURRENT_USERNAME=$(gh api user -q ".login" 2>/dev/null)
 
-if [ ! $(git rev-parse --verify submission 2>/dev/null) ]; then
-  git branch submission 2>/dev/null
+# Create submission branch if it doesn't exist
+if ! git rev-parse --verify submission >/dev/null 2>&1; then
+  log_step "Creating 'submission' branch"
+  git branch submission >/dev/null 2>&1
 fi
 
-# We need to push the submission to the submission branch so we just want to switch back after
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# Save the current branch to return later
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 
-echo "Pushing all changes"
-git push --all origin
-git checkout submission
-git commit -m "Submission" --allow-empty
-git push origin submission
-git checkout $CURRENT_BRANCH
+log_step "Pushing all branches"
+git push --all origin >/dev/null 2>&1
 
+log_step "Committing to 'submission' branch"
+git checkout submission >/dev/null 2>&1
+git commit -m "Submission" --allow-empty >/dev/null 2>&1
+git push origin submission >/dev/null 2>&1
+
+# Return to the original branch
+git checkout "$CURRENT_BRANCH" >/dev/null 2>&1
+
+# Create a PR if one doesn't already exist
 if [[ -z $OPEN_PR ]]; then
-  echo "You don't have an open PR for $EXERCISE_NAME yet, creating one on your behalf"
+  log_step "No open PR found — creating a new pull request"
   gh pr create \
     --repo git-mastery/$EXERCISE_NAME \
     --title "[$CURRENT_USERNAME] [$EXERCISE_NAME] Submission" \
     --body "" \
-    --head $CURRENT_USERNAME:submission
+    --head $CURRENT_USERNAME:submission >/dev/null 2>&1
+else
+  log_step "An open PR already exists — skipping PR creation"
 fi
+
+PR_URL=$(gh pr list --state "open" --author "@me" --head "submission" --json url -q '.[0].url')
+log_step "Submission process complete!"
+log_step "Go to '$PR_URL' for the feedback!"
