@@ -68,6 +68,6 @@ else
   log_step "An open PR already exists — skipping PR creation"
 fi
 
-PR_URL=$(gh pr list --state "open" --author "@me" --head "submission" --json url -q '.[0].url')
+PR_URL=$(gh pr list --state "open" --author "@me" --head "submission" --json url -q '.[0].url' -L 1 | awk '{print($0)}' | column)
 log_step "Submission process complete!"
 log_step "Go to '$PR_URL' for the feedback!"
