@@ -64,6 +64,9 @@ if [[ -z $OPEN_PR ]]; then
     --title "[$CURRENT_USERNAME] [$EXERCISE_NAME] Submission" \
     --body "" \
     --head $CURRENT_USERNAME:submission >/dev/null 2>&1
+
+  # sleep for a while so we can retrieve the PR URL
+  sleep 2
 else
   log_step "An open PR already exists — skipping PR creation"
 fi
